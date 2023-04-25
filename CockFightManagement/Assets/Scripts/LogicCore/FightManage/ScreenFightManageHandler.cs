@@ -15,15 +15,23 @@ public class ScreenFightManageHandler : BaseUIPopup
         base.OnShow();
 
         ParseData();
+
+        CalendarController.Instance._onChangeDate -= this.ParseDayData;
+        CalendarController.Instance._onChangeDate += this.ParseDayData;
     }
 
     public void ParseData()
     {
-        List<FightData> fightsInADay = GameManager.Instance.GetFightsInToday();
+        ParseDayData(GameManager.Instance._todayDate);
+    }
+
+    public void ParseDayData(System.DateTime day)
+    {
+        List<FightData> fightsInADay = GameManager.Instance.GetFightsInDay(day);
         _items ??= new List<FightItemUI>();
 
-        int amountToSpawn = fightsInADay.Count - _items.Count ;
-        if(amountToSpawn >= 0)
+        int amountToSpawn = fightsInADay.Count - _items.Count;
+        if (amountToSpawn >= 0)
         {
             for (int i = 0; i < amountToSpawn; i++)
             {
@@ -33,7 +41,7 @@ public class ScreenFightManageHandler : BaseUIPopup
 
         for (int i = 0; i < _items.Count; i++)
         {
-            if(i >= fightsInADay.Count)
+            if (i >= fightsInADay.Count)
             {
                 _items[i].gameObject.SetActive(false);
             }
@@ -46,6 +54,7 @@ public class ScreenFightManageHandler : BaseUIPopup
 
         this._btnCreateNewFight.transform.SetAsFirstSibling();
     }
+
     public FightItemUI AddItem()
     {
         FightItemUI item = Instantiate<FightItemUI>(this._prefab, this._tfPanelItems);

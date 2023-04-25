@@ -21,7 +21,7 @@ public class GameManager : MonoSingleton<GameManager>
             return _userDatas;
         }
     }
-    private System.DateTime _todayDate;
+    public System.DateTime _todayDate;
 
     public void OpenGame()
     {
@@ -95,9 +95,12 @@ public class GameManager : MonoSingleton<GameManager>
 
     public List<FightData> GetFightsInToday()
     {
-        return this.UserDatas.GetFightInADay(GameUtils.GetTodayDate());
+        return this.UserDatas.GetFightInADay(_todayDate);
     }
-
+    public List<FightData> GetFightsInDay(System.DateTime day)
+    {
+        return this.UserDatas.GetFightInADay(day);
+    }
     #endregion Screen Fights Management
 
     #region Ticket
