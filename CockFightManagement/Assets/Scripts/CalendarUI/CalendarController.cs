@@ -118,7 +118,7 @@ public class CalendarController : MonoSingleton<CalendarController>
     public void OnDateItemClick(string day)
     {
         _target.text = $"Ngày {day} Tháng {_monthNumTextMeshProUGUI.text} Năm {_yearNumTextMeshProUGUI.text}"; ;
-        _calendarPanel.SetActive(false);
+        //_calendarPanel.SetActive(false);
 
         _onChangeDate?.Invoke(new DateTime(int.Parse(_yearNumTextMeshProUGUI.text), int.Parse(_monthNumTextMeshProUGUI.text), int.Parse(day)));
     }

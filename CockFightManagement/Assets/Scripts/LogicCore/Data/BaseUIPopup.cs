@@ -8,6 +8,10 @@ public class BaseUIPopup : MonoBehaviour
     {
 
     }
+    public virtual void OnClickClose()
+    {
+        GameManager.Instance.HideUI(this);
+    }
     public virtual void Hide()
     {
         this.gameObject.SetActive(false);

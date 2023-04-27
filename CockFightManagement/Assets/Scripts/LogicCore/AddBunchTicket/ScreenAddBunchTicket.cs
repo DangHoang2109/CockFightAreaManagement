@@ -17,15 +17,15 @@ public class ScreenAddBunchTicket : BaseUIPopup
     {
         base.OnShow();
     }
-    public void ParseData(int fightID)
+    public ScreenAddBunchTicket ParseData(int fightID)
     {
         this._fightID = fightID;
         //add one default item
         AddItem();
+
+        return this;
     }
-    public TicketItemInputUI AddItem()
-    {
-        TicketItemInputUI item = Instantiate<TicketItemInputUI>(this._prefab, this._tfPanelItems);
+    IEnumerator ieAddItem(TicketItemInputUI item) {
 
         item._onCbCannotMoveLocalInput -= OnItemSubmited;
         item._onCbCannotMoveLocalInput += OnItemSubmited;
@@ -35,8 +35,17 @@ public class ScreenAddBunchTicket : BaseUIPopup
         item.transform.SetAsFirstSibling();
         this._btnCreateNewItem.transform.SetAsFirstSibling();
 
+        yield return new WaitForEndOfFrame();
+
         //set select to the first input of this item
         item.SelectFirstInput();
+    }
+    public TicketItemInputUI AddItem()
+    {
+        TicketItemInputUI item = Instantiate<TicketItemInputUI>(this._prefab, this._tfPanelItems);
+
+        StartCoroutine(ieAddItem(item));
+
         return item;
     }
     public void OnClickAddItem()
@@ -87,6 +96,9 @@ public class ScreenAddBunchTicket : BaseUIPopup
     //{
 
     //}
+
+    public System.Action<bool, int> _onEndFight;
+
     public void OnClickEndFight_Blue()
     {
         OnEndFight(0);
@@ -100,5 +112,7 @@ public class ScreenAddBunchTicket : BaseUIPopup
         Debug.Log("End Fight " + idCockWining);
         //calculate the wining money,
         GameManager.Instance.OnEndFight(idCockWining, this._fightID, UpdateListTicket());
+
+        _onEndFight?.Invoke(true, idCockWining);
     }
 }

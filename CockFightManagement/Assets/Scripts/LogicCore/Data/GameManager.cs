@@ -55,10 +55,16 @@ public class GameManager : MonoSingleton<GameManager>
         T ob = this.GetUI<T>();
         if (ob != null)
         {
-            ob.Hide();
+            HideUI(ob);
         }
     }
-
+    public void HideUI(BaseUIPopup t)
+    {
+        if(t != null)
+        {
+            t.Hide();
+        }
+    }
     #region Setting
 
     public static string GetCockName(int cockID)
@@ -109,7 +115,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void OnEndFight(int idCockWining, int fightID, List<TicketData> tickets)
     {
-        ShowUI<ScreenFightManageHandler>();
+        ScreenFightManageHandler manage = ShowUI<ScreenFightManageHandler>();
         HideUI<ScreenAddBunchTicket>();
 
         //calculate the winning
@@ -117,6 +123,8 @@ public class GameManager : MonoSingleton<GameManager>
         {
             CalculateWiningOfAFight(idCockWining,fightID, tickets);
         }
+
+        manage.Refresh();
     }
     private void CalculateWiningOfAFight(int idCockWining,int fightID,List<TicketData> tickets)
     {

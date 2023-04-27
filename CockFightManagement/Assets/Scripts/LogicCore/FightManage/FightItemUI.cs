@@ -15,8 +15,16 @@ public class FightItemUI : MonoBehaviour
 
         _tmpFightName.SetText($"Độ {data.FightName}");
 
-        _tmpFightResult.gameObject.SetActive(data.IsEnded);
-        _tmpFightResult.SetText($"{GameManager.GetCockName(data.IDCockWIn)} thắng");
+        OnEndFight(data.IsEnded, data.IDCockWIn);
+    }
+    public void Refresh()
+    {
+        OnEndFight(this._fightData.IsEnded, _fightData.IDCockWIn);
+    }
+    public void OnEndFight(bool isEnd, int idCockWin)
+    {
+        _tmpFightResult.gameObject.SetActive(isEnd);
+        _tmpFightResult.SetText($"{GameManager.GetCockName(idCockWin)} thắng");
     }
     public void OnClickItem()
     {
@@ -27,8 +35,10 @@ public class FightItemUI : MonoBehaviour
         }
         else
         {
-            GameManager.Instance.ShowUI<ScreenAddBunchTicket>()
+            ScreenAddBunchTicket scre = GameManager.Instance.ShowUI<ScreenAddBunchTicket>()
                 .ParseData(this._fightData._id);
+            //scre._onEndFight -= this.OnEndFight;
+            //scre._onEndFight += this.OnEndFight;
         }
     }
 }

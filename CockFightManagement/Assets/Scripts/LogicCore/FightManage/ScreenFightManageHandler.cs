@@ -10,6 +10,7 @@ public class ScreenFightManageHandler : BaseUIPopup
     public List<FightItemUI> _items;
     public Transform _tfPanelItems;
 
+    private System.DateTime _currentChoseDate;
     public override void OnShow()
     {
         base.OnShow();
@@ -24,9 +25,18 @@ public class ScreenFightManageHandler : BaseUIPopup
     {
         ParseDayData(GameManager.Instance._todayDate);
     }
+    public void Refresh()
+    {
+        foreach (FightItemUI item in this._items)
+        {
+            item.Refresh();
+        }
+    }
 
     public void ParseDayData(System.DateTime day)
     {
+        _currentChoseDate = day;
+
         List<FightData> fightsInADay = GameManager.Instance.GetFightsInDay(day);
         _items ??= new List<FightItemUI>();
 

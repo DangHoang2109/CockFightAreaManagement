@@ -223,7 +223,7 @@ public class FightDatasInDate
             fight.PushBackDataTicket(tickets);
         }
     }
-    public bool BuyTicket(int fightID, string buyerID, int cockID, long betMoney)
+    public bool BuyTicket(int fightID, string buyerID, int cockID, decimal betMoney)
     {
         try
         {
@@ -286,16 +286,16 @@ public class FightData
     public int _idCockWin ;
     public int IDCockWIn => _idCockWin;
 
-    public long TotalBetMoney
+    public decimal TotalBetMoney
     {
         get
         {
             if (_tickets == null || _tickets.Count == 0)
                 return 0;
-            return _tickets.Sum(x => x._betMoney);
+            return _tickets.Sum(x => x._betMoney.Value);
         }
     }
-    public long TotalBetMoneyOfACock(int cockID)
+    public decimal TotalBetMoneyOfACock(int cockID)
     {
         if (_tickets == null || _tickets.Count == 0)
             return 0;
@@ -304,7 +304,7 @@ public class FightData
 
         if(tick != null && tick.Any())
         {
-            return tick.Sum(x => x._betMoney);
+            return tick.Sum(x => x._betMoney.Value);
         }
         return 0;
     }
@@ -333,7 +333,7 @@ public class FightData
     {
         _tickets = new List<TicketData>(tickets);
     }
-    public void BuyTicket(string buyerID, int cockID, long betMoney)
+    public void BuyTicket(string buyerID, int cockID, decimal betMoney)
     {
         _tickets ??= new List<TicketData>();
         TicketData tick = new TicketData()
@@ -341,7 +341,7 @@ public class FightData
             _id = _tickets.Count,
             _buyerID = buyerID,
             _cockID = cockID,
-            _betMoney = betMoney
+            _betMoney = new ValueDecimalSerial(betMoney)
         };
         _tickets.Add(tick);
     }
@@ -367,6 +367,57 @@ public class FightData
 
 
 #region Ticket 
+[System.Serializable]
+public class ValueDecimalSerial
+{
+    public decimal Value => decimal.Parse(_saveValue);
+    public string _saveValue;
+
+    public static ValueDecimalSerial operator +(ValueDecimalSerial a, ValueDecimalSerial b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value + b.Value).ToString() };
+    }
+    public static ValueDecimalSerial operator -(ValueDecimalSerial a, ValueDecimalSerial b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value - b.Value).ToString() };
+    }
+    public static ValueDecimalSerial operator *(ValueDecimalSerial a, ValueDecimalSerial b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value * b.Value).ToString() };
+    }
+    public static ValueDecimalSerial operator /(ValueDecimalSerial a, ValueDecimalSerial b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value / b.Value).ToString() };
+    }
+    public static ValueDecimalSerial operator +(ValueDecimalSerial a, decimal b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value + b).ToString() };
+    }
+    public static ValueDecimalSerial operator -(ValueDecimalSerial a, decimal b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value - b).ToString() };
+    }
+    public static ValueDecimalSerial operator *(ValueDecimalSerial a, decimal b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value * b).ToString() };
+    }
+    public static ValueDecimalSerial operator /(ValueDecimalSerial a, decimal b)
+    {
+        return new ValueDecimalSerial { _saveValue = (a.Value / b).ToString() };
+    }
+    public ValueDecimalSerial(ValueDecimalSerial v)
+    {
+        this._saveValue = v._saveValue;
+    }
+    public ValueDecimalSerial()
+    {
+        this._saveValue = "0";
+    }
+    public ValueDecimalSerial(decimal val)
+    {
+        this._saveValue = val.ToString();
+    }
+}
 
 [System.Serializable]
 public class TicketData
@@ -376,11 +427,11 @@ public class TicketData
     public string _buyerID;
     public int _cockID;
 
-    public long _betMoney;
+    public ValueDecimalSerial _betMoney;
 
     //these var will be set when the game ended, by manager;
     public bool _isThisTicketWon;
-    public long _wonMoney;
+    public ValueDecimalSerial _wonMoney;
 
     public TicketData()
     {
@@ -398,7 +449,10 @@ public class TicketData
     public void EndGame(bool isWon)
     {
         this._isThisTicketWon = isWon;
-        this._wonMoney = (long)(this._betMoney * GameDataManager.Instance.SettingDatas._ratioCutOfWining);
+        this._wonMoney = 
+            isWon ? 
+            (this._betMoney * GameDataManager.Instance.SettingDatas._ratioCutOfWining) : 
+            (this._betMoney * -1m);
     }
 
     public TicketData CombineTicket(TicketData other)
@@ -414,6 +468,80 @@ public class TicketData
         return this;
     }
 }
+[System.Serializable]
+public class TableMultipleCockTicketData
+{
+    public int _id;
+
+    public string _buyerID;
+
+    //This will display cock ticket of one single player who buy multiple ticket of a cock
+    public List<TicketData> _variCocksTicket;
+
+    public Dictionary<int, TicketData> _dicVariCocksTicket; //cockID, Ticket (combined)
+    
+    private void SetupDic()
+    {
+        if(_variCocksTicket != null)
+        {
+            _dicVariCocksTicket = new Dictionary<int, TicketData>();
+            foreach (TicketData item in _variCocksTicket)
+            {
+                CombineTicketIfCan(item);
+            }
+        }
+    }
+
+    private void CombineTicketIfCan(TicketData item)
+    {
+        if (_dicVariCocksTicket.ContainsKey(item._cockID))
+        {
+            _dicVariCocksTicket[item._cockID].CombineTicket(item);
+        }
+        else
+        {
+            _dicVariCocksTicket.Add(item._cockID, item);
+        }
+    }
+
+    public TicketData GetCombinedTickOfACock(int cockID)
+    {
+        if(_dicVariCocksTicket != null)
+        {
+            if (_dicVariCocksTicket.TryGetValue(cockID, out TicketData combinedTick))
+                return combinedTick;
+        }
+        return null;
+    }
+    public TableMultipleCockTicketData()
+    {
+        this._variCocksTicket = new List<TicketData>();
+    }
+    public TableMultipleCockTicketData(TableMultipleCockTicketData t)
+    {
+        this._id = t._id;
+        this._buyerID = t._buyerID;
+        _variCocksTicket = new List<TicketData>();
+        foreach (TicketData item in t._variCocksTicket)
+        {
+            _variCocksTicket.Add(new TicketData(item));
+        }
+
+        SetupDic();
+    }
+
+    public void CombineTicket(TicketData other)
+    {
+        if (this._buyerID == other._buyerID)
+        {
+            _dicVariCocksTicket ??= new Dictionary<int, TicketData>();
+            this._variCocksTicket ??= new List<TicketData>();
+
+            _variCocksTicket.Add(other);
+            CombineTicketIfCan(other);
+        }
+    }
+}
 #endregion
 
 
@@ -421,14 +549,14 @@ public class TicketData
 [System.Serializable]
 public class UserAppSetting
 {
-    public double _ratioCutOfWining = 0.95;
+    public decimal _ratioCutOfWining = 0.95M;
     public List<CockData> _cocks;
 
     public static UserAppSetting CreateBase()
     {
         return new UserAppSetting()
         {
-            _ratioCutOfWining = 0.95,
+            _ratioCutOfWining = 0.95M,
             _cocks = new List<CockData>()
             {
                 new CockData() { _cockID = 0, _cockName = "Xanh" },

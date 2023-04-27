@@ -150,7 +150,7 @@ public class TicketItemInputUI : MonoBehaviour
             return null;
         }
 
-        _thisTicketData._betMoney = money;
+        _thisTicketData._betMoney = new ValueDecimalSerial(money);
         return this._thisTicketData;
     }
 }

@@ -962,8 +962,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -175, y: 0}
-  m_SizeDelta: {x: -350, y: 0}
+  m_AnchoredPosition: {x: -200, y: 0}
+  m_SizeDelta: {x: -400, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5579589032420432817
 CanvasRenderer:
@@ -1435,7 +1435,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 930, y: 0}
+  m_SizeDelta: {x: 880, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5579589033087045073
 CanvasRenderer:
@@ -1509,7 +1509,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 270, y: 150}
+  m_CellSize: {x: 258, y: 150}
   m_Spacing: {x: 30, y: 30}
   m_Constraint: 1
   m_ConstraintCount: 3
@@ -1820,7 +1820,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 350, y: 0}
+  m_SizeDelta: {x: 400, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &5579589033496872254
 CanvasRenderer:
@@ -1873,7 +1873,7 @@ GameObject:
   - component: {fileID: 7038414317753261122}
   - component: {fileID: 7481219467811933698}
   m_Layer: 5
-  m_Name: BtnNewFight (1)
+  m_Name: BtnCalendar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2192,7 +2192,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 224000012321101736, guid: 451e098a6248fd64c9fbdb1c5880845c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 127
+      value: 141
       objectReference: {fileID: 0}
     - target: {fileID: 224000012321101736, guid: 451e098a6248fd64c9fbdb1c5880845c, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2353,7 +2353,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7104308494306028977, guid: 0fa1a1f22dd4740418ae39fda6e38322, type: 3}
       propertyPath: m_fontSize
-      value: 30.3
+      value: 28.65
       objectReference: {fileID: 0}
     - target: {fileID: 7104308494306028977, guid: 0fa1a1f22dd4740418ae39fda6e38322, type: 3}
       propertyPath: m_fontAsset
