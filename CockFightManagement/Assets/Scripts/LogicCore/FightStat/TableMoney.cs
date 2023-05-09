@@ -14,11 +14,9 @@ public class TableMoney : MonoBehaviour
     /// Pass in the data of all tickets in a fight
     /// </summary>
     /// <param name="ticketDatas"></param>
-    public void ParseData(List<TicketData> ticketDatas)
+    public void ParseData(List<TableMultipleCockTicketData> combinedData)
     {
         _items ??= new List<TableMoneyItem>();
-
-        List<TableMultipleCockTicketData> combinedData = ValidateAndCombineTicketToSinglePlayer(ticketDatas);
 
         int amountToSpawn = combinedData.Count - _items.Count;
         if (amountToSpawn >= 0)
@@ -51,39 +49,6 @@ public class TableMoney : MonoBehaviour
 
 
         decimal ValueOfACock(TableMultipleCockTicketData combinedData, int cockID, bool isBet) => ((isBet ? combinedData.GetCombinedTickOfACock(cockID: cockID)?._betMoney.Value : combinedData.GetCombinedTickOfACock(cockID: cockID)?._wonMoney.Value) ?? 0);
-    }
-    /// <summary>
-    /// Gộp tất cả các phiếu lại thành phiếu record theo từng buyer
-    /// Format sẽ trông như sau:
-    /// IDPlayer - TotalBetMoneyOfBlueCock - TotalBetMoneyOfRedCock
-    /// Hoặc
-    /// IDPlayer - TotalWonMoneyOfBlueCock - TotalWonMoneyOfRedCock
-    /// </summary>
-    /// <returns></returns>
-    private List<TableMultipleCockTicketData> ValidateAndCombineTicketToSinglePlayer(List<TicketData> ticketDatas)
-    {
-        List<TableMultipleCockTicketData> res = new List<TableMultipleCockTicketData>();
-        Dictionary<string, TableMultipleCockTicketData> dicPlayers = new Dictionary<string, TableMultipleCockTicketData>();
-        foreach (TicketData item in ticketDatas)
-        {
-            if(dicPlayers.TryGetValue(item._buyerID, out TableMultipleCockTicketData combineTicket))
-            {
-                combineTicket.CombineTicket(item);
-            }
-            else
-            {
-                TableMultipleCockTicketData newCombine = new TableMultipleCockTicketData()
-                {
-                    _id = res.Count,
-                    _buyerID = item._buyerID,
-                };
-                newCombine.CombineTicket(item);
-                res.Add(newCombine);
-            }
-        }
-        return res;
-
-
     }
     public TableMoneyItem AddItem()
     {

@@ -496,7 +496,7 @@ public class TableMultipleCockTicketData
     {
         if (_dicVariCocksTicket.ContainsKey(item._cockID))
         {
-            _dicVariCocksTicket[item._cockID].CombineTicket(item);
+            _dicVariCocksTicket[item._cockID] = _dicVariCocksTicket[item._cockID].CombineTicket(item);
         }
         else
         {

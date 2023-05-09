@@ -17,6 +17,8 @@ public class TicketItemInputUI : MonoBehaviour
     public CustomInputField _selectingInput;
 
     public System.Action<bool> _onCbCannotMoveLocalInput;
+    public System.Action<TicketItemInputUI> _onDeleteItem;
+
     private TicketData _thisTicketData;
 #if UNITY_EDITOR
     private void OnValidate()
@@ -28,6 +30,15 @@ public class TicketItemInputUI : MonoBehaviour
     {
         SetupInput();
         _thisTicketData = emptyStartTicket;
+    }
+    public void SetData(TicketData existedTicket)
+    {
+        SetupInput();
+        _thisTicketData = existedTicket;
+
+        this._iptIDPlayer.SetTextWithoutNotify(existedTicket._buyerID);
+        this._iptNameCock.SetTextWithoutNotify(GameManager.GetCockName(existedTicket._cockID));
+        this._iptBetMoney.SetTextWithoutNotify(existedTicket._betMoney.Value.FormatMoneyDot());
     }
     public void SelectFirstInput()
     {
@@ -107,14 +118,21 @@ public class TicketItemInputUI : MonoBehaviour
     }
     public void OnInput_BetMoney(CustomInputField sender, string input)
     {
-        int money = 0;
-        if (int.TryParse(input, out money))
+        long money = 0;
+
+        //remove all delimiter in input
+        input = input.Replace(".", "");
+
+        if (long.TryParse(input, out money))
         {
             if (money < 0)
-                money = Mathf.Abs(money);
+                money = money * -1;
+
+            if (money < 1000)
+                money *= 1000;
         }
 
-        sender.SetTextWithoutNotify(money.ToString());
+        sender.SetTextWithoutNotify(money.FormatMoneyDot());
     }
 
     public TicketData GenerateThisTicketData()
@@ -139,7 +157,9 @@ public class TicketItemInputUI : MonoBehaviour
             Debug.Log("ERROR: EMPTY BET MONEY");
             return null;
         }
-        if(!int.TryParse(this._iptBetMoney.text, out int money))
+
+        string input = this._iptBetMoney.text.Replace(".", "");
+        if (!long.TryParse(input, out long money))
         {
             Debug.Log("ERROR: ERROR BET MONEY");
             return null;
@@ -152,6 +172,11 @@ public class TicketItemInputUI : MonoBehaviour
 
         _thisTicketData._betMoney = new ValueDecimalSerial(money);
         return this._thisTicketData;
+    }
+
+    public void ClickDeleteThisTicket()
+    {
+        _onDeleteItem?.Invoke(this);
     }
 }
 

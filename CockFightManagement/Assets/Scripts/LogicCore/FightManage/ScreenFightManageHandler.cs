@@ -35,7 +35,7 @@ public class ScreenFightManageHandler : BaseUIPopup
 
     public void ParseDayData(System.DateTime day)
     {
-        _currentChoseDate = day;
+        this._currentChoseDate = GameManager.Instance._currentChoseDate = day;
 
         List<FightData> fightsInADay = GameManager.Instance.GetFightsInDay(day);
         _items ??= new List<FightItemUI>();

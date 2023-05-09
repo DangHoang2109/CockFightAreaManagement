@@ -14,6 +14,11 @@ public class BaseUIPopup : MonoBehaviour
     }
     public virtual void Hide()
     {
+        OnHiding();
         this.gameObject.SetActive(false);
+    }
+    public virtual void OnHiding()
+    {
+
     }
 }

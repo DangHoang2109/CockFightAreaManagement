@@ -22,14 +22,20 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
     public System.DateTime _todayDate;
+    public System.DateTime _currentChoseDate;
 
     public void OpenGame()
     {
         _todayDate = GameUtils.GetTodayDate();
 
         this.ShowUI<ScreenFightManageHandler>();
-
-
+    }
+    public void CloseGame()
+    {
+#if UNITY_EDITOR
+#else
+Application.Quit();
+#endif
     }
     public T GetUI<T>() where T : BaseUIPopup
     {
@@ -65,7 +71,7 @@ public class GameManager : MonoSingleton<GameManager>
             t.Hide();
         }
     }
-    #region Setting
+#region Setting
 
     public static string GetCockName(int cockID)
     {
@@ -84,9 +90,9 @@ public class GameManager : MonoSingleton<GameManager>
         return UserDatas.CreateEmptyTicket(date,fightID);
     }
 
-    #endregion Setting
+#endregion Setting
 
-    #region Screen Fights Management
+#region Screen Fights Management
 
     public bool OnCreateNewFight(out FightData newFightData)
     {
@@ -107,11 +113,11 @@ public class GameManager : MonoSingleton<GameManager>
     {
         return this.UserDatas.GetFightInADay(day);
     }
-    #endregion Screen Fights Management
+#endregion Screen Fights Management
 
-    #region Ticket
+#region Ticket
 
-    #endregion
+#endregion
 
     public void OnEndFight(int idCockWining, int fightID, List<TicketData> tickets)
     {
@@ -137,44 +143,25 @@ public class GameManager : MonoSingleton<GameManager>
             //print these final ticket
             PrintBillForAFight(_todayDate, fight);
         }
+    }
+    public void PrintBillForAFight(System.DateTime date, string fightName, List<TableMultipleCockTicketData> _combinedTicketsData)
+    {
+        FightDocument doc = new FightDocument(date, fightName, _combinedTicketsData);
 
-
+        PrintingManager.Instance.GenerateAndPrintDocument(doc.ToDocument());
     }
     private void PrintBillForAFight(System.DateTime date,string fightName, List<TicketData> tickets)
     {
-        Debug.Log("IN BILL");
-        Debug.Log($"Ngày: {date.ToShortDateString()} - Độ: {fightName}");
-
-        tickets = ValidatingTickets(tickets);
-        foreach (TicketData ticket in tickets)
-        {
-            string res = ticket._isThisTicketWon ? $"Thắng {ticket._wonMoney}" : "Thua";
-
-            Debug.Log($"ID: {ticket._id} - Đặt gà: {GetCockName(ticket._cockID)} {ticket._betMoney}vnd - {res}");
-        }
+        List<TableMultipleCockTicketData>  _combinedTicketsData = GameUtils.ValidateAndCombineTicketToSinglePlayer(tickets);
+        PrintBillForAFight(date, fightName, _combinedTicketsData);
     }
     private void PrintBillForAFight(System.DateTime date, FightData fight)
     {
         PrintBillForAFight(date, fight.FightName, fight.Tickets);
     }
-    private List<TicketData> ValidatingTickets(List<TicketData> tickets)
+
+    public void TempSaveAFight(System.DateTime date,int fightID, List<TicketData> tickets)
     {
-        //gom lại các phiếu của cùng 1 người chơi
-        List<TicketData> result = new List<TicketData>();
-        Dictionary<string, TicketData> dicTicket = new Dictionary<string, TicketData>();
-        for (int i = 0; i < tickets.Count; i++)
-        {
-            if (dicTicket.ContainsKey(tickets[i]._buyerID))
-            {
-                dicTicket[tickets[i]._buyerID] = dicTicket[tickets[i]._buyerID].CombineTicket(tickets[i]);
-            }
-        }
-
-        foreach (string id in dicTicket.Keys)
-        {
-            result.Add(dicTicket[id]);
-        }
-
-        return result;
+        UserDatas.PushBackDataTicket(date,fightID, tickets);
     }
 }

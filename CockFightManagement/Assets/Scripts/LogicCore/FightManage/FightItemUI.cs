@@ -36,9 +36,7 @@ public class FightItemUI : MonoBehaviour
         else
         {
             ScreenAddBunchTicket scre = GameManager.Instance.ShowUI<ScreenAddBunchTicket>()
-                .ParseData(this._fightData._id);
-            //scre._onEndFight -= this.OnEndFight;
-            //scre._onEndFight += this.OnEndFight;
+                .ParseData(this._fightData);
         }
     }
 }
